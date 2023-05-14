@@ -5,15 +5,15 @@ The following architecture and pipelines were used to create a microservice into
 
 ![alt text](game_service_architecture.png "Game Service Architecture")
 
-1.	Static game WebAssembly code and React web pages served through Cloudfront via S3 to minimize latency. WebAssembly is a low-level binary format that allows for high-performance code execution in the browser, meaning the games had fast load times and better performance (exported from Unity3d.)
-2.	In addition, the games were also deployed as a native iOS app with a Swift-C++ bridge (partially exported from Unity3d.) This provided an optimized experience for iOS users.
-3.	Traffic routed by an ALB enabling secure communication (TLS, JWT, and API keys) between the frontends and backend via REST APIs.
-4.	The backend runs on ECS, a managed container orchestration service that simplifies the deployment, management, and scaling of containerized, high-performance applications, making it a good choice for mobile games backends. The backend was containerized using Docker and then deployed to ECS leveraging blue-green deploys to allow releases during near-peak usage. AWS services were provisioned using Terraform, a common Infrastructure as Code (IaC) tool. Codewise, we leveraged Java Spring Boot, a widely used framework for building enterprise-grade applications in Java.
-5.	As a microservice, the backend required services from the tech ecosystem communicating via APIs to get user information and a JWT system leveraging Redis to improve security and provide common metadata for transactions and logging.
-6.	Aurora was used as a managed PostgreSQL-compatible relational DB for primary storage.
-7.	DynamoDB (NoSQL DB) was used for temporary storage of data that would be ETL-ed via a Lambda pipeline to Kafka then the data lake. Both DBs provided scalable, durable, and performant storage and flexibility for our different data types.
-8.	SQS was used as a dead-letter queue for exception handling of data that failed to send to kafka for various reasons.
-9.	Most systems sent logging and metrics along with a common session identifier to Splunk for correlation across systems and to create KPI dashboards.
+1. The static game WebAssembly code and React web pages were served through Cloudfront via S3 to minimize latency. WebAssembly, a low-level binary format that allows for high-performance code execution in the browser, meant that the games had fast load times and better performance (exported from Unity3d).
+2. In addition, the games were also deployed as a native iOS app with a Swift-C++ bridge (partially exported from Unity3d). This provided an optimized experience for iOS users.
+3. The traffic was routed by an ALB, which enabled secure communication (TLS, JWT, and API keys) between the frontends and backend via REST APIs.
+4. The backend ran on ECS, a managed container orchestration service that simplified the deployment, management, and scaling of containerized, high-performance applications, making it a good choice for  mobile games. The backend was containerized using Docker and then deployed to ECS, leveraging blue-green deploys to allow releases during near-peak usage. AWS services were provisioned using Terraform, a common Infrastructure as Code (IaC) tool. Codewise, the application used Java Spring Boot, a widely used framework for building enterprise-grade applications in Java.
+5. As a microservice, the backend required services from the tech ecosystem communicating via APIs to get user information, and a JWT system leveraging Redis to improve security and provide common metadata for transactions and logging.
+6. Aurora was used as a managed PostgreSQL-compatible relational DB for primary storage.
+7. DynamoDB (NoSQL DB) was used for temporary storage of data that would be ETL-ed via a Lambda pipeline to Kafka, then the data lake. Both DBs provided scalable, durable, and performant storage and flexibility for our different data types.
+8. SQS was used as a dead-letter queue for exception handling of data that failed to send to Kafka for various reasons.
+9. Most systems sent logging and metrics along with a common session identifier to Splunk for correlation across systems and to create KPI dashboards.
 
 *Benefits:*
 1. Scalability: Using Java Spring Boot on ECS allows the backend to scale up or down as needed to handle varying levels of traffic, ensuring a smooth user experience. It also provided multi-version concurrency control for older iOS app versions (institutional customers took longer to update.)
