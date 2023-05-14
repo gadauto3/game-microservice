@@ -1,5 +1,5 @@
 # Game Microservice Architecture and Pipeline
-The following architecture and pipelines were used to create a microservice into a monolithic application. To best serve our users, we created cross-platform deployments to Support Chromebook and iPad usage, and upon request, the systems would have easily ported to android. This architecture provides a scalable, performant, and flexible solution for building a cross-platform mobile game with a Java Spring Boot backend connected to both Aurora and DynamoDB databases and a frontend that utilizes WebAssembly embedded in a React page as well as native iOS apps.
+The following architecture and pipelines were used to create a microservice into a monolithic application. To best serve our users, we created cross-platform deployments to support Chromebook and iPad usage, and upon request, the systems would have easily ported to android. This architecture provides a scalable, performant, and flexible solution for building a cross-platform mobile game with a Java Spring Boot backend connected to both Aurora and DynamoDB databases and a frontend that utilizes WebAssembly embedded in a React page as well as native iOS apps.
 
 ## Architecture
 
