@@ -1,9 +1,19 @@
 # Game Microservice Architecture and Pipeline
-The following architecture and pipelines were used to create a microservice into a monolithic application (my mandate as a result of an acquisition of the company I cofounded). To best serve our teacher users, we created cross-platform deployments to Support Chromebook and iPad usage, and the systems would have easily ported to android, though sales did not drive us there.
+The following architecture and pipelines were used to create a microservice into a monolithic application. To best serve our users, we created cross-platform deployments to Support Chromebook and iPad usage, and upon request, the systems would have easily ported to android. This architecture provides a scalable, performant, and flexible solution for building a cross-platform mobile game with a Java Spring Boot backend connected to both Aurora and DynamoDB databases and a frontend that utilizes WebAssembly embedded in a React page as well as native iOS apps.
 
 ## Architecture
 
 ![alt text](game_service_architecture.png "Game Service Architecture")
+
+1.	Static game WebAssembly code and React web pages served through Cloudfront via S3 to minimize latency. WebAssembly is a low-level binary format that allows for high-performance code execution in the browser, meaning the games had fast load times and better performance (exported from Unity3d.)
+2.	In addition, the games were also deployed as a native iOS app with a Swift-C++ bridge (partially exported from Unity3d.) This provided an optimized experience for iOS users.
+3.	Traffic routed by an ALB enabling secure communication (TLS, JWT, and API keys) between the frontends and backend via REST APIs.
+4.	The backend runs on ECS, a managed container orchestration service that simplifies the deployment, management, and scaling of containerized, high-performance applications, making it a good choice for mobile games backends. The backend was containerized using Docker and then deployed to ECS leveraging blue-green deploys to allow releases during near-peak usage. AWS services were provisioned using Terraform, a common Infrastructure as Code (IaC) tool. Codewise, we leveraged Java Spring Boot, a widely used framework for building enterprise-grade applications in Java.
+5.	As a microservice, the backend required services from the tech ecosystem communicating via APIs to get user information and a JWT system leveraging Redis to improve security and provide common metadata for transactions and logging.
+6.	Aurora was used as a managed PostgreSQL-compatible relational DB for primary storage.
+7.	DynamoDB (NoSQL DB) was used for temporary storage of data that would be ETL-ed via a Lambda pipeline to Kafka then the data lake. Both DBs provided scalable, durable, and performant storage and flexibility for our different data types.
+8.	SQS was used as a dead-letter queue for exception handling of data that failed to send to kafka for various reasons.
+9.	Most systems sent logging and metrics along with a common session identifier to Splunk for correlation across systems and to create KPI dashboards.
 
 *Benefits:*
 1. Scalability: Using Java Spring Boot on ECS allows the backend to scale up or down as needed to handle varying levels of traffic, ensuring a smooth user experience. It also provided multi-version concurrency control for older iOS app versions (institutional customers took longer to update.)
@@ -11,21 +21,6 @@ The following architecture and pipelines were used to create a microservice into
 3. Flexibility: The use of WebAssembly embedded in a React page as well as native iOS apps provides flexibility in terms of supporting multiple platforms.
 4. Performance: We optimized web artifacts for download speed (small memory footprints served via CDN) and iOS for aesthetic beauty. The use of WebAssembly provides near-native performance, allowing the game to run smoothly and quickly in the browser. 
 5. Ease of Deployment: The use of Parameter Store and Secrets Manager for managing configuration data and secrets, as well as the use of Cloudfront and S3 for serving static assets, simplifies the deployment process and reduces the potential for errors or misconfigurations.
-
-*Overview:*
-This architecture provides a scalable, performant, and flexible solution for building a cross-platform mobile game with a Java Spring Boot backend connected to both Aurora and DynamoDB databases and a frontend that utilizes WebAssembly embedded in a React page as well as native iOS apps.
-
-*Backend Architecture:*
-* Java Spring Boot: A widely used framework for building enterprise-grade applications in Java. It provides a robust set of tools for building scalable and high-performance applications, making it a good choice for mobile games backends.
-* Amazon Elastic Container Service (ECS): This managed container orchestration service simplified the deployment, management, and scaling of our containerized applications..
-* Aurora and DynamoDB DBs: We used Aurora as a managed PostgreSQL-compatible relational DB for primary storage while DynamoDB (NoSQL DB) was used for temporary storage of data that would be ETL-ed via a Lambda pipeline to Kafka then the data lake. Both provided scalable, durable, and performant storage and flexibility for our different data types.
-
-*Frontend Architecture:*
-* React: Used as the primary front-end language in the organization, we used it mainly as a responsive container for the WebAssembly artifacts.
-* WebAssembly: A low-level binary format that allows for high-performance code execution in the browser, meaning the games had fast load times and better performance (exported from Unity3d.)
-* Native iOS apps: The games were also deployed in a native iOS app with a Swift-C++ bridge (partially exported from Unity3d.) This provided an optimized experience for iOS users.
-
-Communication between the frontend and backend was achieved through REST APIs that used TLS, JWT, and API keys for security. The backend was containerized using Docker and then deployed to ECS leveraging blue-green deploys to allow deploys to occur during near-peak usage. AWS services were provisioned using Terraform, a common Infrastructure as Code (IaC) tool.
 
 ## SDLC Pipeline
 
